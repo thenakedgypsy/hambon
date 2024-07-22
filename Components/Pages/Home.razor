@@ -1,0 +1,48 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+<PageTitle>Core</PageTitle>
+
+@if(firstLogin)
+{
+    <h1> Please set your name... </h1>
+    <p> Set your name here: </p>
+    <p> <input @bind=nameInput/> <button @onclick="setName"> OK </button></p>
+}
+else
+{
+    <h1>@(Player.PlayerName):</h1>
+    <p>Level @Player.Level</p>
+    <p>HP: @Player.CurrentHP / @Player.MaxHP</p>
+    <p>XP: @Player.CurrentXP / @Player.NeededXP</p>
+
+    <h1>@(enemy.EnemyName):</h1>
+    <p>Level @enemy.Level</p>
+    <p>HP: @enemy.CurrentHP / @enemy.MaxHP</p>
+    <button @onclick="regen"> Regen (TEST) </button>
+}
+
+
+
+@code
+{   
+    public static bool firstLogin = true;
+    public string nameInput = "";
+    public void setName()
+    {
+        Player.PlayerName = nameInput;
+        nameInput = "";
+        firstLogin = false;
+    }
+
+
+    public Enemy enemy = EnemyGenerator.Generate();
+
+    public void regen()
+    {
+        enemy = EnemyGenerator.Generate();
+    }
+
+    
+
+}   

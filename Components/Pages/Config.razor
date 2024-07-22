@@ -1,0 +1,20 @@
+@page "/config"
+@rendermode InteractiveServer
+
+
+<h1> This is the config page </h1>
+<p> Change your name here: </p>
+<p> <input @bind=nameInput/> <button @onclick="setName"> Change! </button></p>
+
+@code
+{
+    public string nameInput = "";
+    public void setName()
+    {
+        Player.PlayerName = nameInput;
+        nameInput = "";
+    }
+
+
+
+}

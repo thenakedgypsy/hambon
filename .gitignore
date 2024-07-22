@@ -1,0 +1,9 @@
+/Properties
+/obj
+/bin
+/wwwroot
+*.css
+*.csproj
+*.json
+
+
