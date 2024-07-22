@@ -1,7 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 
-<PageTitle>Core</PageTitle>
+<PageTitle>BATTLE!</PageTitle>
 
 @if(firstLogin)
 {
@@ -14,12 +14,14 @@ else
     <h1>@(Player.PlayerName):</h1>
     <p>Level @Player.Level</p>
     <p>HP: @Player.CurrentHP / @Player.MaxHP</p>
+    <p>Strength: @Player.Strength -------------   <button @onclick="attack"> Melee Attack! </button> </p>
+    <p>Intelligence: @Player.Strength -------------   <button @onclick="attack"> Magic Attack! </button> </p>
     <p>XP: @Player.CurrentXP / @Player.NeededXP</p>
 
     <h1>@(enemy.EnemyName):</h1>
     <p>Level @enemy.Level</p>
     <p>HP: @enemy.CurrentHP / @enemy.MaxHP</p>
-    <button @onclick="regen"> Regen (TEST) </button>
+    <button @onclick="regen"> Regen(TEST) </button>
 }
 
 
@@ -41,6 +43,11 @@ else
     public void regen()
     {
         enemy = EnemyGenerator.Generate();
+    }
+
+    public void attack()
+    {
+
     }
 
     

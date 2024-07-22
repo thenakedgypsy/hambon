@@ -6,6 +6,7 @@ public static class Player
     public static int CurrentHP {get; set;} = 100;
     public static int MaxHP {get; set;} = 100;
     public static int Level {get; set;} = 1;
+    public static int Strength {get;set;} = 3;
 
 public static void resetProgress()
 {
