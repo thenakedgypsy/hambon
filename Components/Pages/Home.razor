@@ -12,16 +12,32 @@
 else
 {
     <h1>@(Player.PlayerName):</h1>
-    <p>Level @Player.Level</p>
+    <p>Level @Player.Level - Gold: @Player.Gold</p>
     <p>HP: @Player.CurrentHP / @Player.MaxHP</p>
     <p>Strength: @Player.Strength -------------   <button @onclick="attack"> Melee Attack! </button> </p>
-    <p>Intelligence: @Player.Strength -------------   <button @onclick="attack"> Magic Attack! </button> </p>
+    <p>Intelligence: @Player.Intelligence   -------------- <button @onclick="attack"> Magic Attack! </button> </p>
+    <p>Shield: @Player.Shield</p>
     <p>XP: @Player.CurrentXP / @Player.NeededXP</p>
 
     <h1>@(enemy.EnemyName):</h1>
     <p>Level @enemy.Level</p>
     <p>HP: @enemy.CurrentHP / @enemy.MaxHP</p>
+    <p>Toughness: @enemy.Toughness </p>
     <button @onclick="regen"> Regen(TEST) </button>
+
+    if(combatStarted)
+    {
+    <h1> Combat Log: </h1>
+    <h2> Round: @roundNumber </h2>
+    <p>@Player.PlayerName attacks!</p>
+    <p>@Player.PlayerName rolls @playerRoll!</p>
+    <p>@damageDone damage done to @enemy.EnemyName!</p>
+    <p>@enemy.EnemyName attacks back!</p>
+    <p>@enemy.EnemyName rolls @enemyRoll!</p>
+    <p>@damageTaken damage done to @Player.PlayerName!</p>
+    }
+
+
 }
 
 
@@ -30,6 +46,14 @@ else
 {   
     public static bool firstLogin = true;
     public string nameInput = "";
+    public int playerRoll;
+    public int enemyRoll;
+    public int damageDone;
+    public int damageTaken;
+    public bool combatStarted = false;
+    public int roundNumber = 0;
+
+
     public void setName()
     {
         Player.PlayerName = nameInput;
@@ -48,6 +72,22 @@ else
     public void attack()
     {
 
+        combatStarted = true;
+        playerRoll = Player.AttackRoll();
+        damageDone = playerRoll - enemy.Toughness;
+        if(damageDone < 1)
+        {
+            damageDone = 1;
+        }
+        enemy.CurrentHP -= damageDone;
+        enemyRoll = enemy.AttackRoll();
+        damageTaken = enemyRoll - Player.Shield;
+        if(damageTaken < 1)
+        {
+            damageTaken = 1;
+        }
+        Player.CurrentHP -= damageTaken;
+        roundNumber++;
     }
 
     

@@ -18,10 +18,15 @@ public static class EnemyGenerator
     {
         
         Random random = new Random();
-        int level = 1 * random.Next(1,10 * Player.Level);
+        int level = 1 * random.Next(1,9 + Player.Level);
         double health = random.Next(1,level*5) * level;
         int nameSeed = random.Next(0,names.Count);
-        Enemy enemy = new Enemy(names[nameSeed],(int)health,level);
+        int toughness = random.Next(-3,3) + level;
+        if(toughness < 1)
+        {
+            toughness = 1;
+        }
+        Enemy enemy = new Enemy(names[nameSeed],(int)health,level,toughness);
         return enemy;
     }
 
