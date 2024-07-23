@@ -1,27 +1,6 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 
-<style>
-.split-container {
-    display: flex;
-    width: 100%;
-}
-
-.left-side, .right-side {
-    padding: 10px;
-    box-sizing: border-box;
-}
-
-.left-side {
-    width: 50%;
-    border-right: 1px solid #ddd;
-}
-
-.right-side {
-    width: 50%;
-}
-</style>
-
 <PageTitle>BATTLE!</PageTitle>
 
 @if(firstLogin)
@@ -35,8 +14,8 @@ else
 {
     @if(!loss)
     {
-    <div class ="split-container">
-        <div class="left-side">
+    <div style="display: flex; justify-content: space-between; padding: 20px;">
+        <div style="width: 45%; padding: 10px;">
             <h1>@(Player.PlayerName):</h1>
             <p>Level @Player.Level - Gold: @Player.Gold</p>
             <p>HP: @Player.CurrentHP / @Player.MaxHP</p>
@@ -44,19 +23,28 @@ else
             <p>Intelligence: @Player.Intelligence @if(combat){ <p></p> <button @onclick="attack">--Magic Attack!--</button>} </p>
             <p>Shield: @Player.Shield</p>
             <p>XP: @Player.CurrentXP / @Player.NeededXP</p>
+    @if(victory)
+    {
+        <h2> Victory! @Player.PlayerName gains @(xpGained)XP!</h2>
+    }
+
+    @if(!combat)
+    {
+        <button @onclick="battle">BATTLE!</button>
+    }
         </div>
     
     @if(combat)
     {
-        <div class="right-side">
-
+    <div style="width: 85%; padding: 10px;">
         <h1>@(enemy.EnemyName):</h1>
         <p>Level @enemy.Level</p>
         <p>HP: @enemy.CurrentHP / @enemy.MaxHP</p>
         <p>Toughness: @enemy.Toughness </p>
-        <h2> Combat Log: </h2>
+    </div>
+    <div style="width: 20%; padding: 10px;">
         <h3> Round:  @roundNumber </h3>
-        
+        <h3> Combat Log: </h3>
         @if(roundNumber > 0)
         {
             <p>@Player.PlayerName attacks!</p>
@@ -66,19 +54,10 @@ else
             <p>@enemy.EnemyName rolls @enemyRoll!</p>
             <p>@damageTaken damage done to @Player.PlayerName!</p>
         }
-        
-    }
-    @if(victory)
-    {
-        <h2> Victory! @Player.PlayerName gains @(xpGained)XP!</h2>
-    }
         </div>
-
-    @if(!combat)
-    {
-        <button @onclick="battle">BATTLE!</button>
     }
-    
+
+    </div>
     }
     else 
     {
@@ -86,7 +65,6 @@ else
         <h2> @Player.PlayerName is slain!</h2>
         <h2><button @onclick="reset"> Try Again </button></h2>
     }
-    </div>
 }
 
 
