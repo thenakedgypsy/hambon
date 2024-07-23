@@ -1,44 +1,94 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 
+<style>
+.split-container {
+    display: flex;
+    width: 100%;
+}
+
+.left-side, .right-side {
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.left-side {
+    width: 50%;
+    border-right: 1px solid #ddd;
+}
+
+.right-side {
+    width: 50%;
+}
+</style>
+
 <PageTitle>BATTLE!</PageTitle>
 
 @if(firstLogin)
 {
-    <h1> Please set your name... </h1>
+    <h1> Blazing Clicker Battles </h1>
+    <h2> Please set your name... </h2>
     <p> Set your name here: </p>
     <p> <input @bind=nameInput/> <button @onclick="setName"> OK </button></p>
 }
 else
 {
-    <h1>@(Player.PlayerName):</h1>
-    <p>Level @Player.Level - Gold: @Player.Gold</p>
-    <p>HP: @Player.CurrentHP / @Player.MaxHP</p>
-    <p>Strength: @Player.Strength -------------   <button @onclick="attack"> Melee Attack! </button> </p>
-    <p>Intelligence: @Player.Intelligence   -------------- <button @onclick="attack"> Magic Attack! </button> </p>
-    <p>Shield: @Player.Shield</p>
-    <p>XP: @Player.CurrentXP / @Player.NeededXP</p>
-
-    <h1>@(enemy.EnemyName):</h1>
-    <p>Level @enemy.Level</p>
-    <p>HP: @enemy.CurrentHP / @enemy.MaxHP</p>
-    <p>Toughness: @enemy.Toughness </p>
-    <button @onclick="regen"> Regen(TEST) </button>
-
-    if(combatStarted)
+    @if(!loss)
     {
-    <h1> Combat Log: </h1>
-    <h2> Round: @roundNumber </h2>
-    <p>@Player.PlayerName attacks!</p>
-    <p>@Player.PlayerName rolls @playerRoll!</p>
-    <p>@damageDone damage done to @enemy.EnemyName!</p>
-    <p>@enemy.EnemyName attacks back!</p>
-    <p>@enemy.EnemyName rolls @enemyRoll!</p>
-    <p>@damageTaken damage done to @Player.PlayerName!</p>
+    <div class ="split-container">
+        <div class="left-side">
+            <h1>@(Player.PlayerName):</h1>
+            <p>Level @Player.Level - Gold: @Player.Gold</p>
+            <p>HP: @Player.CurrentHP / @Player.MaxHP</p>
+            <p>Strength: @Player.Strength @if(combat){ <p></p> <button @onclick="attack">--Melee Attack!--</button>}</p>
+            <p>Intelligence: @Player.Intelligence @if(combat){ <p></p> <button @onclick="attack">--Magic Attack!--</button>} </p>
+            <p>Shield: @Player.Shield</p>
+            <p>XP: @Player.CurrentXP / @Player.NeededXP</p>
+        </div>
+    
+    @if(combat)
+    {
+        <div class="right-side">
+
+        <h1>@(enemy.EnemyName):</h1>
+        <p>Level @enemy.Level</p>
+        <p>HP: @enemy.CurrentHP / @enemy.MaxHP</p>
+        <p>Toughness: @enemy.Toughness </p>
+        <h2> Combat Log: </h2>
+        <h3> Round:  @roundNumber </h3>
+        
+        @if(roundNumber > 0)
+        {
+            <p>@Player.PlayerName attacks!</p>
+            <p>@Player.PlayerName rolls @playerRoll!</p>
+            <p>@damageDone damage done to @enemy.EnemyName!</p>
+            <p>@enemy.EnemyName attacks back!</p>
+            <p>@enemy.EnemyName rolls @enemyRoll!</p>
+            <p>@damageTaken damage done to @Player.PlayerName!</p>
+        }
+        
     }
+    @if(victory)
+    {
+        <h2> Victory! @Player.PlayerName gains @(xpGained)XP!</h2>
+    }
+        </div>
 
-
+    @if(!combat)
+    {
+        <button @onclick="battle">BATTLE!</button>
+    }
+    
+    }
+    else 
+    {
+        <h1> YOU LOSE </h1>
+        <h2> @Player.PlayerName is slain!</h2>
+        <h2><button @onclick="reset"> Try Again </button></h2>
+    }
+    </div>
 }
+
 
 
 
@@ -50,8 +100,12 @@ else
     public int enemyRoll;
     public int damageDone;
     public int damageTaken;
-    public bool combatStarted = false;
+    public bool combat = false;
+    public bool victory = false;
+    public bool loss = false;
     public int roundNumber = 0;
+
+    public int xpGained = 0;
 
 
     public void setName()
@@ -59,6 +113,12 @@ else
         Player.PlayerName = nameInput;
         nameInput = "";
         firstLogin = false;
+    }
+
+    public void battle()
+    {
+        combat = true;
+        victory = false;
     }
 
 
@@ -72,7 +132,6 @@ else
     public void attack()
     {
 
-        combatStarted = true;
         playerRoll = Player.AttackRoll();
         damageDone = playerRoll - enemy.Toughness;
         if(damageDone < 1)
@@ -80,16 +139,50 @@ else
             damageDone = 1;
         }
         enemy.CurrentHP -= damageDone;
-        enemyRoll = enemy.AttackRoll();
-        damageTaken = enemyRoll - Player.Shield;
-        if(damageTaken < 1)
+
+        if (!enemyDead())
         {
+            enemyRoll = enemy.AttackRoll();
+            damageTaken = enemyRoll - Player.Shield;
+            if(damageTaken < 1)
+            {
             damageTaken = 1;
+            }
+            Player.CurrentHP -= damageTaken;
+            if(Player.CurrentHP < 1)
+            {
+                loss = true;
+            }
+            roundNumber++;
         }
-        Player.CurrentHP -= damageTaken;
-        roundNumber++;
     }
 
-    
+    public bool enemyDead()
+    {
+        if(enemy.CurrentHP > 0) 
+        {
+            return false;
+        }
+        combat = false;
+        victory = true;
+        regen();
+        Player.HealToFull();
+        xpGained = enemy.Level * 10;
+        Player.CurrentXP += xpGained;
+        roundNumber = 0;
+        return true;
+    }
 
+    public void reset()
+    {
+        Player.ResetProgress();
+        regen();
+        roundNumber = 0;
+        loss = false;
+        combat = false;
+        firstLogin = true;
+    }
+    
 }   
+
+

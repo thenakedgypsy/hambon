@@ -14,7 +14,7 @@ public static class Player
     public static int Gold {get;set;} = 0;
 
 
-public static void resetProgress()
+public static void ResetProgress()
 {
     PlayerName = "";
     NeededXP = 100;
@@ -29,6 +29,11 @@ public static int AttackRoll()
     Random random = new Random();
     int roll = Strength * random.Next(1,6);
     return roll;
+}
+
+public static void HealToFull()
+{
+    CurrentHP = MaxHP;
 }
 
 
